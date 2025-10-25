@@ -37,10 +37,10 @@ int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
     SSL *ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
     if (!preverify_ok) {
         const char *msg = "peer did not return a certificate or returned an invalid one\n";
-        // Προσπαθούμε να στείλουμε μήνυμα αν η σύνδεση είναι ακόμα ενεργή
+        // try to sent message if connection is still up
         SSL_write(ssl, msg, strlen(msg));
     }
-    return preverify_ok; // Επιστρέφει 0 αν αποτύχει η verify
+    return preverify_ok; // return 0 if verify failed
 }
 SSL_CTX* InitServerCTX(void) {
     /* TODO:
