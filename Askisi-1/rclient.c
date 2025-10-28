@@ -102,21 +102,49 @@ int main(int argc, char *argv[])
     SSL *ssl;
     int server;
 
-    /* Initialize SSL context and load the ROGUE client cert/key */
+    /* TODO:
+     * 1. Initialize SSL context using InitCTX
+     * 2. Load client certificate and key using LoadCertificates
+     */
     ctx = InitCTX();                                  /* 1) Build client TLS context */
-    LoadCertificates(ctx, "rclient.crt", "rclient.key");/* 2) Load ROGUE client cert/key for mTLS */
+    LoadCertificates(ctx, "rclient.crt", "rclient.key");/* 2) Load client cert/key for mTLS */
 
     server = OpenConnection(hostname, port);          /* TCP connect */
     ssl = SSL_new(ctx);                               /* Per-connection TLS object */
     SSL_set_fd(ssl, server);                          /* Bind the socket to TLS */
 
-    if (SSL_connect(ssl) == FAIL) {                   /* TLS handshake (client side) */
+    /* TODO:
+     * 1. Establish SSL connection using SSL_connect
+     * 2. Ask user to enter username and password
+     * 3. Build XML message dynamically
+     * 4. Send XML message over SSL
+     * 5. Read server response and print it
+     */
+    if (SSL_connect(ssl) == FAIL) {                   /* 1) TLS handshake (client side) */
         ERR_print_errors_fp(stderr);
         SSL_free(ssl);
         close(server);
         SSL_CTX_free(ctx);
         return 1;
-    }
+    } 
+
+    // /* 2) Prompt for credentials */
+    // char username[64], password[64];
+    // printf("Enter username: "); fflush(stdout);
+    // if (scanf("%63s", username) != 1) strcpy(username, "");
+    // printf("Enter password: "); fflush(stdout);
+    // if (scanf("%63s", password) != 1) strcpy(password, "");
+
+    // /* 3) Build XML message */
+    // char msg[256];
+    // snprintf(msg, sizeof(msg),
+    //          "<Body><UserName>%s</UserName><Password>%s</Password></Body>",
+    //          username, password);
+
+    // /* 4) Send over TLS */
+    // if (SSL_write(ssl, msg, (int)strlen(msg)) <= 0) {
+    //     ERR_print_errors_fp(stderr);
+    // }
 
     /* 5) Read server response */
     char buf[512] = {0};
@@ -133,3 +161,4 @@ int main(int argc, char *argv[])
     SSL_CTX_free(ctx);
     return 0;
 }
+
