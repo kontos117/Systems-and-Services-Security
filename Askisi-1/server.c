@@ -10,8 +10,6 @@
 
 #define FAIL -1
 
-
-
 typedef struct userData {
     char name[100];
     char password[100];
