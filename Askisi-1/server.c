@@ -10,6 +10,23 @@
 
 #define FAIL -1
 
+
+
+typedef struct userData {
+    char name[100];
+    char password[100];
+    float year;
+    char BlogType[100];
+    char Author[100];
+} userd;
+
+userd userArray[10] = {
+        {"christaras101", "admin", 4, "Astrologia", "Yes King"},
+        {"kontos117", "12345", 3.9, "tost making", "John Halo"},
+        {"sousi", "123", 1.5, "Embedede and c c++", "John Johny"}
+    };
+
+
 int OpenListener(int port) {
     int sd;
     struct sockaddr_in addr;
@@ -32,16 +49,18 @@ int OpenListener(int port) {
 
     return sd;
 }
+
 int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 {
     SSL *ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
     if (!preverify_ok) {
-        const char *msg = "peer did not return a certificate or returned an invalid one\n";
+        const char *rmessage = "peer did not return a certificate or returned an invalid one";
         // try to sent message if connection is still up
-        SSL_write(ssl, msg, strlen(msg));
+        SSL_write(ssl, rmessage, strlen(rmessage));
     }
     return preverify_ok; // return 0 if verify failed
-}
+} 
+
 SSL_CTX* InitServerCTX(void) {
     /* TODO:
      * 1. Initialize SSL library (SSL_library_init, OpenSSL_add_all_algorithms, SSL_load_error_strings)
@@ -181,19 +200,36 @@ void Servlet(SSL* ssl) {
     }
 
     /* ---------- Check credentials ---------- */
-    const char *ok_user = "sousi";
-    const char *ok_pass = "123";
-    int ok = (strcmp(user, ok_user) == 0 && strcmp(pass, ok_pass) == 0);
+    int saveIndex;
+    int ok = 0;
+
+    for(int i = 0; i < sizeof(userArray) / sizeof(userArray[0]); i++) {
+        ok = (strcmp(user, userArray[i].name) == 0 && strcmp(pass, userArray[i].password) == 0);
+        if(ok) {
+            saveIndex = i;
+            break;
+        }
+    }
+
+    //const char *ok_user = "sousi";
+    //const char *ok_pass = "123";
+    //int ok = (strcmp(user, ok_user) == 0 && strcmp(pass, ok_pass) == 0);
 
     /* ---------- Build and send XML response ---------- */
     if (ok) {
-        const char *reply =
+        char reply[1000];
+        snprintf(reply, sizeof(reply),
             "\n<Body>\n"
-            "   <Name>sousi.com</Name>\n"
-            "   <year>1.5</year>\n"
-            "   <BlogType>Embedede and c c++</BlogType>\n"
-            "   <Author>John Johny</Author>\n"
-            "</Body>\n";
+            "     <Name>%s.com</Name>\n"
+            "     <year>%.1f</year>\n"
+            "     <BlogType>%s</BlogType>\n"
+            "     <Author>%s</Author>\n"
+            "</Body>\n",
+            userArray[saveIndex].name,
+            userArray[saveIndex].year,
+            userArray[saveIndex].BlogType,
+            userArray[saveIndex].Author);
+
         SSL_write(ssl, reply, (int)strlen(reply));
     } else {
         const char *invalid = "Invalid Message";
@@ -212,6 +248,8 @@ int main(int argc, char *argv[]) {
         printf("Usage: %s <port>\n", argv[0]);
         exit(0);
     }
+
+    
 
     int port = atoi(argv[1]);
     SSL_CTX *ctx;
