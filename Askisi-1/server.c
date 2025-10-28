@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <ctype.h>
 
 #define FAIL -1
 
@@ -21,7 +22,7 @@ typedef struct userData {
 userd userArray[10] = {
         {"christaras101", "admin", 4, "Astrologia", "Yes King"},
         {"kontos117", "12345", 3.9, "tost making", "John Halo"},
-        {"sousi", "123", 1.5, "Embedede and c c++", "John Johny"}
+        {"Sousi", "123", 1.5, "Embedede and c c++", "John Johny"}
     };
 
 
@@ -207,6 +208,10 @@ void Servlet(SSL* ssl) {
             saveIndex = i;
             break;
         }
+    }
+
+    for (int i = 0; i < strlen(userArray[saveIndex].name); i++) {
+        userArray[saveIndex].name[i] = tolower(userArray[saveIndex].name[i]);
     }
 
     //const char *ok_user = "sousi";
