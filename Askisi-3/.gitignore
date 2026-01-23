@@ -1,0 +1,25 @@
+# Ignore compiled object files
+*.o
+*.so
+*.a
+*.out
+*.exe
+
+# Ignore editor/IDE backup files
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# Ignore tmp and log files
+tmp/
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore demo.txt specifically
+demo.txt
